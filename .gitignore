@@ -91,3 +91,6 @@ ENV/
 # Eclipse
 .project
 .pydevproject
+
+# Ignore pkl files
+*.pkl
