@@ -1,5 +1,6 @@
 import os
-from modulecache.invalidators import VersioneerInvalidator
+from modulecache.invalidators import VersioneerInvalidator,\
+    FileChangeInvalidator
 from nose.tools import assert_equal
 from modulecache.base import containing_directory
 from modulecache.backends import PickleBackend
@@ -43,9 +44,33 @@ def test_versioneer():
             value = 3
         assert_equal(value, 3)
     finally:
-        if os.path.exists('testcache.pkl'):
-            os.remove('testcache.pkl')
-        
+        if os.path.exists(filename):
+            os.remove(filename)
+
+def test_file_change():
+    cachefilename = os.path.join(containing_directory(), 'testcache.pkl')
+    path = 'testfilechange'
+    suppress = list(globals().keys())
+    try:
+        with open(path, 'wb') as outfile:
+            outfile.write('1')
+        with PickleBackend(cachefilename, suppress) as cache, FileChangeInvalidator(cache, path):
+            value = 'a'
+        assert_equal(value, 'a')
+        with PickleBackend(cachefilename, suppress) as cache, FileChangeInvalidator(cache, path):
+            value = 'b'
+        assert_equal(value, 'a')
+        with open(path, 'wb') as outfile:
+            outfile.write('2')
+        with PickleBackend(cachefilename, suppress) as cache, FileChangeInvalidator(cache, path):
+            value = 'b'
+        assert_equal(value, 'b')
+    finally:
+        if os.path.exists(cachefilename):
+            os.remove(cachefilename)
+        if os.path.exists(path):
+            os.remove(path)
+
 if __name__ == '__main__': 
     import sys
     import nose

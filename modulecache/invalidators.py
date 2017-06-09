@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from .base import ModuleCacheValid
-from modulecache.base import nocache
+from modulecache.base import nocache, path_of_caller
 
 class ModuleCacheInvalidator(object):
     __metaclass__ = ABCMeta
@@ -44,6 +44,9 @@ class AlwaysValid(ModuleCacheInvalidator):
         pass
 
 class VersioneerInvalidator(ModuleCacheInvalidator):
+    '''
+    Use versioneer version information to invalidate the cache.
+    '''
     def __init__(self, backend, versioneer_info):
         ModuleCacheInvalidator.__init__(self, backend)
         self.versioneer_info = versioneer_info
@@ -54,3 +57,25 @@ class VersioneerInvalidator(ModuleCacheInvalidator):
     
     def new_metadata(self, moduledata):
         return self.versioneer_info
+
+class FileChangeInvalidator(ModuleCacheInvalidator):
+    '''
+    Invalidate the cache if the specified file has changed.  Stores the entire file as metadata.
+    '''
+    def __init__(self, backend, path=None):
+        ModuleCacheInvalidator.__init__(self, backend)
+        self.path = path #if path is not None else path_of_caller()
+        
+    def _check(self, metadata, moduledata):
+        contents = self.new_metadata(moduledata)
+        if metadata == contents:
+            raise ModuleCacheValid()
+    
+    def new_metadata(self, moduledata):
+        with open(self.path, 'rb') as infile:
+            contents = infile.read()
+        return contents
+    
+    
+        
+        

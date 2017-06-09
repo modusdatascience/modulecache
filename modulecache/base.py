@@ -21,3 +21,6 @@ nocache = NoCache()
 
 def containing_directory():
     return os.path.abspath(os.path.dirname(inspect.stack()[1][0].f_globals['__file__']))
+
+def path_of_caller():
+    return os.path.abspath(inspect.stack()[1][0].f_globals['__file__'])
