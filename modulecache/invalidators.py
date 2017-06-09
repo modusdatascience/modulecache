@@ -42,3 +42,15 @@ class AlwaysValid(ModuleCacheInvalidator):
     
     def new_metadata(self, moduledata):
         pass
+
+class VersioneerInvalidator(ModuleCacheInvalidator):
+    def __init__(self, backend, versioneer_info):
+        ModuleCacheInvalidator.__init__(self, backend)
+        self.versioneer_info = versioneer_info
+
+    def _check(self, metadata, moduledata):
+        if not self.versioneer_info['dirty'] and metadata['version'] == self.versioneer_info['version']:
+            raise ModuleCacheValid()
+    
+    def new_metadata(self, moduledata):
+        return self.versioneer_info
