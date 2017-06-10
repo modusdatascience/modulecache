@@ -2,4 +2,5 @@ name: modulecachedev
 dependencies:
     - python=2.7.12
     - nose
-
+    - pip:
+        - toolz

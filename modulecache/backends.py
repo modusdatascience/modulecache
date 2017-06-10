@@ -2,9 +2,11 @@ from abc import ABCMeta, abstractmethod
 from modulecache.base import ModuleCacheValid, nocache
 import pickle
 import inspect
-from toolz.dicttoolz import dissoc, valfilter
+from toolz.dicttoolz import dissoc, valfilter, itemmap
 from toolz.functoolz import complement, flip
 from types import ModuleType
+import traceback
+from itertools import starmap
 
 class ModuleCacheBackend(object):
     __metaclass__ = ABCMeta
@@ -31,6 +33,10 @@ class ModuleCacheBackend(object):
         '''
         Write metadata and moduledata to cache backend.
         '''
+        pass
+    
+    @abstractmethod
+    def _check_cachabilit(self, name, obj):
         pass
     
     def __enter__(self):
@@ -63,6 +69,10 @@ class ModuleCacheBackend(object):
         elif exc_value is None:
             new_moduledata = valfilter(complement(flip(isinstance)(ModuleType)), 
                                        dissoc(inspect.stack()[1][0].f_globals, *self.suppress))
+            
+            # Check that all objects can be cached
+            for _ in starmap(self._check_cachabilit, new_moduledata.items()): pass
+            
             new_metadata = self.invalidator.new_metadata(new_moduledata)
             self._put_in_cache(new_metadata, new_moduledata)
             return True
@@ -86,4 +96,10 @@ class PickleBackend(ModuleCacheBackend):
         with open(self.filename, 'wb') as outfile:
             pickle.dump((metadata, moduledata), outfile)
         
+    def _check_cachabilit(self, name, obj):
+        try:
+            pickle.dumps(obj)
+        except:
+            traceback.print_exc()
+            raise TypeError('Variable %s containing object of type %s can\'t be pickled.' % (name, type(obj).__name__))
         

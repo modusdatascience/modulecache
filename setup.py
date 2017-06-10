@@ -10,6 +10,6 @@ setup(name='modulecache',
       author_email='jcrudy@gmail.com',
       url='https://github.com/jcrudy/modulecache',
       packages=find_packages(),
-      install_requires=[],
-      tests_require=[]
+      install_requires=['toolz'],
+      tests_require=['nose']
      )
