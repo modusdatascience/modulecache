@@ -36,7 +36,7 @@ class ModuleCacheBackend(object):
         pass
     
     @abstractmethod
-    def _check_cachabilit(self, name, obj):
+    def _check_cachability(self, name, obj):
         pass
     
     def __enter__(self):
@@ -71,7 +71,7 @@ class ModuleCacheBackend(object):
                                        dissoc(inspect.stack()[1][0].f_globals, *self.suppress))
             
             # Check that all objects can be cached
-            for _ in starmap(self._check_cachabilit, new_moduledata.items()): pass
+            for _ in starmap(self._check_cachability, new_moduledata.items()): pass
             
             new_metadata = self.invalidator.new_metadata(new_moduledata)
             self._put_in_cache(new_metadata, new_moduledata)
@@ -96,7 +96,7 @@ class PickleBackend(ModuleCacheBackend):
         with open(self.filename, 'wb') as outfile:
             pickle.dump((metadata, moduledata), outfile)
         
-    def _check_cachabilit(self, name, obj):
+    def _check_cachability(self, name, obj):
         try:
             pickle.dumps(obj)
         except:
