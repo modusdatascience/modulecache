@@ -157,5 +157,5 @@ class FileChangeInvalidator(ChangeInvalidator):
         
     def new_metadata(self, moduledata):
         with open(self.path, 'rb') as infile:
-            contents = infile.read().encode('utf8')
+            contents = infile.read().encode('string_escape')
         return contents
