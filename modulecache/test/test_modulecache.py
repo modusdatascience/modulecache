@@ -2,8 +2,8 @@ import os
 from modulecache.invalidators import VersioneerInvalidator,\
     FileChangeInvalidator
 from nose.tools import assert_equal
-from modulecache.base import containing_directory
 from modulecache.backends import PickleBackend
+from modulecache.base import source_file_directory
 
 
 def test_basic():
@@ -21,7 +21,7 @@ def test_basic():
             os.remove('testcache.pkl')
 
 def test_versioneer():
-    filename = os.path.join(containing_directory(), 'testcache.pkl')
+    filename = os.path.join(source_file_directory(), 'testcache.pkl')
     suppress = list(globals().keys())
     try:
         with PickleBackend(filename, suppress) as cache,  \
@@ -48,7 +48,7 @@ def test_versioneer():
             os.remove(filename)
 
 def test_file_change():
-    cachefilename = os.path.join(containing_directory(), 'testcache.pkl')
+    cachefilename = os.path.join(source_file_directory(), 'testcache.pkl')
     path = 'testfilechange'
     suppress = list(globals().keys())
     try:

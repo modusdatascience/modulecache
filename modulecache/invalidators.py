@@ -1,8 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from .base import ModuleCacheValid
-from modulecache.base import nocache, path_of_caller
+from modulecache.base import nocache
 from toolz.functoolz import flip
-import inspect
 
 class ModuleCacheInvalidator(object):
     __metaclass__ = ABCMeta

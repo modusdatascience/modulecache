@@ -19,8 +19,8 @@ class NoCache(object):
 
 nocache = NoCache()
 
-def source_file_path():
-    modpath = inspect.stack()[1][0].f_globals['__file__']
+def source_file_path(level=1):
+    modpath = inspect.stack()[level][0].f_globals['__file__']
 
     # Turn pyc files into py files if we can
     if modpath.endswith('.pyc') and os.path.exists(modpath[:-1]):
@@ -30,6 +30,6 @@ def source_file_path():
     modpath = os.path.realpath(modpath)
     return modpath
 
-def source_file_directory():
-    return os.path.abspath(os.path.dirname(source_file_path()))
+def source_file_directory(level=1):
+    return os.path.abspath(os.path.dirname(source_file_path(level+1)))
     
