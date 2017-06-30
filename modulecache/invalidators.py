@@ -153,9 +153,9 @@ class FileChangeInvalidator(ChangeInvalidator):
     '''
     def __init__(self, backend, path=None):
         ModuleCacheInvalidator.__init__(self, backend)
-        self.path = path #if path is not None else path_of_caller()
+        self.path = path
         
     def new_metadata(self, moduledata):
         with open(self.path, 'rb') as infile:
-            contents = infile.read().encode('string_escape')
+            contents = infile.read()
         return contents

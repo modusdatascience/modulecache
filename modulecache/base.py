@@ -19,8 +19,17 @@ class NoCache(object):
 
 nocache = NoCache()
 
-def containing_directory():
-    return os.path.abspath(os.path.dirname(inspect.stack()[1][0].f_globals['__file__']))
+def source_file_path():
+    modpath = inspect.stack()[1][0].f_globals['__file__']
 
-def path_of_caller():
-    return os.path.abspath(inspect.stack()[1][0].f_globals['__file__'])
+    # Turn pyc files into py files if we can
+    if modpath.endswith('.pyc') and os.path.exists(modpath[:-1]):
+        modpath = modpath[:-1]
+    
+    # Sort out symlinks
+    modpath = os.path.realpath(modpath)
+    return modpath
+
+def source_file_directory():
+    return os.path.abspath(os.path.dirname(source_file_path()))
+    
