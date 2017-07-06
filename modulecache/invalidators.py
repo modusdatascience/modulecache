@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 from .base import ModuleCacheValid
 from modulecache.base import nocache
 from toolz.functoolz import flip
+from itertools import starmap, repeat
 
 class ModuleCacheInvalidator(object):
     __metaclass__ = ABCMeta
@@ -53,6 +54,12 @@ class DerivedInvalidator(ModuleCacheInvalidator):
 class MultipleDerivedInvalidator(DerivedInvalidator):
     def __init__(self, *invalidators):
         self.invalidators = invalidators
+        for inv in self.invalidators[1:]:
+            assert inv.backend == self.invalidators[0].backend
+    
+    @property
+    def backend(self):
+        return self.invalidators[0].backend
         
     def new_metadata(self, moduledata):
         return tuple([inv.new_metadata(moduledata) for inv in self.invalidators])
@@ -67,11 +74,15 @@ class MultipleDerivedInvalidator(DerivedInvalidator):
         return result
     
     def _member_checks(self, metadata, moduledata):
-        return tuple(map(flip(self._member_check)(moduledata), zip(metadata, self.invalidators)))
+        return tuple(starmap(self._member_check, zip(self.invalidators, metadata, repeat(moduledata, len(metadata)))))
 
 class SingleDerivedInvalidator(DerivedInvalidator):
     def __init__(self, invalidator):
         self.invalidator = invalidator
+        
+    @property
+    def backend(self):
+        return self.invalidator.backend
     
     def new_metadata(self, moduledata):
         return self.invalidator.new_metadata(moduledata)
