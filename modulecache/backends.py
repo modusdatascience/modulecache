@@ -80,20 +80,21 @@ class ModuleCacheBackend(object):
             return False
             
 class PickleBackend(ModuleCacheBackend):
-    def __init__(self, filename, suppress=[]):
+    def __init__(self, filename, suppress=[], opener=open):
         self.filename = filename
+        self.opener = opener
         ModuleCacheBackend.__init__(self, suppress)
         
     def _get_from_cache(self):
         try:
-            with open(self.filename, 'rb') as infile:
+            with self.opener(self.filename, 'rb') as infile:
                 metadata, moduledata = pickle.load(infile)
             return metadata, moduledata
         except (IOError, EOFError):
             return nocache, {}
         
     def _put_in_cache(self, metadata, moduledata):
-        with open(self.filename, 'wb') as outfile:
+        with self.opener(self.filename, 'wb') as outfile:
             pickle.dump((metadata, moduledata), outfile)
         
     def _check_cachability(self, name, obj):
@@ -102,4 +103,3 @@ class PickleBackend(ModuleCacheBackend):
         except:
             traceback.print_exc()
             raise TypeError('Variable %s containing object of type %s can\'t be pickled.' % (name, type(obj).__name__))
-        
