@@ -52,7 +52,7 @@ def test_file_change():
     path = 'testfilechange'
     suppress = list(globals().keys())
     try:
-        with open(path, 'wb') as outfile:
+        with open(path, 'wt') as outfile:
             outfile.write('1')
         with PickleBackend(cachefilename, suppress) as cache, FileChangeInvalidator(cache, path):
             value = 'a'
@@ -60,7 +60,7 @@ def test_file_change():
         with PickleBackend(cachefilename, suppress) as cache, FileChangeInvalidator(cache, path):
             value = 'b'
         assert_equal(value, 'a')
-        with open(path, 'wb') as outfile:
+        with open(path, 'wt') as outfile:
             outfile.write('2')
         with PickleBackend(cachefilename, suppress) as cache, FileChangeInvalidator(cache, path):
             value = 'b'

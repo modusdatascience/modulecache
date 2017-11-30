@@ -28,7 +28,7 @@ with PickleBackend(cache_filename, suppress) as cache, FileChangeInvalidator(cac
     fib_dict = {}
     for n in range(1, 41):
         f = fib(n)
-        print 'fib(%d) = %d' % (n, f)
+        print('fib(%d) = %d' % (n, f))
         fib_dict[n] = f
     # I don't need f to be available when this module is imported, so delete it.
     del f
