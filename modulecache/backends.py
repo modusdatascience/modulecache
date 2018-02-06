@@ -90,7 +90,7 @@ class PickleBackend(ModuleCacheBackend):
             with self.opener(self.filename, 'rb') as infile:
                 metadata, moduledata = pickle.load(infile)
             return metadata, moduledata
-        except (IOError, EOFError):
+        except (IOError, EOFError, ValueError):
             return nocache, {}
         
     def _put_in_cache(self, metadata, moduledata):
